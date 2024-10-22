@@ -9,7 +9,11 @@ import com.mycompany.adminusers.dataAcces.DataAcces;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.Timer;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 
@@ -18,7 +22,7 @@ import javax.swing.table.DefaultTableModel;
  * @author Pau_Clase
  */
 public class MainForm extends javax.swing.JFrame {
-    private Usuari currentUser = null;
+    private Usuari currentUser = new Usuari();
     /**
      * Creates new form MainForm
      */
@@ -29,6 +33,32 @@ public class MainForm extends javax.swing.JFrame {
             jTable1TableChanged(evt);
         }});
         updateTable();
+        updateClientList();
+        
+        clientList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent evt) {
+                clientListSelectionChanged(evt);
+            }
+        });
+        
+        
+    }
+     private void clientListSelectionChanged(ListSelectionEvent evt) {
+        if (!evt.getValueIsAdjusting()) { // Para evitar eventos duplicados
+            String selectedClient = clientList.getSelectedValue();
+            if (selectedClient != null) {
+                // Parsear el ID del cliente seleccionado
+                String[] parts = selectedClient.split(":");
+                String clientId = parts[1]; // El ID del cliente está después de los dos puntos
+
+                
+                DataAcces da = new DataAcces();
+                currentUser = da.getUser(Integer.parseInt(clientId));
+                System.out.println(currentUser);
+                updateTable();
+            }
+        }
     }
 
     /**
@@ -43,6 +73,8 @@ public class MainForm extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        clientList = new javax.swing.JList<>();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -66,7 +98,7 @@ public class MainForm extends javax.swing.JFrame {
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {},
             new String [] {
-                "ID","Nom", "Email", "PasswordHash", "IsInstructor"
+                "Exercici", "Inici", "Fi"
             }
         ));
         jTable1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
@@ -75,6 +107,9 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
         jScrollPane2.setViewportView(jTable1);
+
+        clientList.setBorder(javax.swing.BorderFactory.createTitledBorder("Clientes"));
+        jScrollPane1.setViewportView(clientList);
 
         jMenu1.setText("Menu");
 
@@ -112,7 +147,9 @@ public class MainForm extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 571, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(29, 29, 29)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 417, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -122,11 +159,11 @@ public class MainForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)))
+                .addContainerGap(35, Short.MAX_VALUE))
         );
 
         pack();
@@ -140,12 +177,27 @@ public class MainForm extends javax.swing.JFrame {
         
         for(Usuari u : usuaris)
             model.addRow(new Object[]{u.getId(), u.getNom(), u.getEmail(), u.getPaswordHash().substring(0,5),u.isInstructor()});
+        
+        
     }
+    
+    private void updateClientList(){
+        DataAcces da = new DataAcces();
+        ArrayList<Usuari> usuaris = da.getUsuaris();
+        
+        
+        DefaultListModel<String> demoList = new DefaultListModel<>();
+        demoList.clear();
+        for (Usuari usuari : usuaris)
+            if (!usuari.isIsInstructor())
+                demoList.addElement(usuari.getNom() + ":" + usuari.getId());
+        
+        
+        clientList.setModel(demoList);
+    }
+    
     private void jTable1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jTable1PropertyChange
-        System.out.println(evt.getOldValue());
-        //DataAcces da = new DataAccces();
-        //evt.getNewValue();
-        //String columnName = model.getColumnName();
+
     }//GEN-LAST:event_jTable1PropertyChange
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -217,12 +269,14 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JList<String> clientList;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItemDelete;
     private javax.swing.JMenuItem jMenuItemRegister;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
