@@ -4,10 +4,12 @@
  */
 package com.mycompany.adminusers;
 
+import com.mycompany.adminusers.DTOs.Intent;
 import com.mycompany.adminusers.DTOs.Usuari;
 import com.mycompany.adminusers.dataAcces.DataAcces;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -32,7 +34,6 @@ public class MainForm extends javax.swing.JFrame {
         public void tableChanged(javax.swing.event.TableModelEvent evt) {
             jTable1TableChanged(evt);
         }});
-        updateTable();
         updateClientList();
         
         clientList.addListSelectionListener(new ListSelectionListener() {
@@ -52,11 +53,7 @@ public class MainForm extends javax.swing.JFrame {
                 String[] parts = selectedClient.split(":");
                 String clientId = parts[1]; // El ID del cliente está después de los dos puntos
 
-                
-                DataAcces da = new DataAcces();
-                currentUser = da.getUser(Integer.parseInt(clientId));
-                System.out.println(currentUser);
-                updateTable();
+                updateTable(Integer.parseInt(clientId));
             }
         }
     }
@@ -169,17 +166,18 @@ public class MainForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    public void updateTable(){
+    public void updateTable(int idUsuari){
         DataAcces da = new DataAcces();
-        ArrayList<Usuari> usuaris = da.getUsuaris();
+        ArrayList<Intent> intents = da.getIntents(idUsuari);
+        
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.setRowCount(0);
         
-        for(Usuari u : usuaris)
-            model.addRow(new Object[]{u.getId(), u.getNom(), u.getEmail(), u.getPaswordHash().substring(0,5),u.isInstructor()});
         
-        
+        for(Intent i : intents)
+            model.addRow(new Object[]{i.getExercici(), i.getInici().format(DateTimeFormatter.ISO_TIME), i.getFi()});
     }
+    
     
     private void updateClientList(){
         DataAcces da = new DataAcces();
