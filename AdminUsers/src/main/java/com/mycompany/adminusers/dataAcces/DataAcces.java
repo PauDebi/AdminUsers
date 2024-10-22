@@ -4,17 +4,18 @@
  */
 package com.mycompany.adminusers.dataAcces;
 
+import com.mycompany.adminusers.DTOs.Intent;
 import com.mycompany.adminusers.DTOs.Usuari;
-import com.mycompany.adminusers.Delete;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
+import java.sql.Timestamp;
 
 /**
  *
@@ -62,6 +63,7 @@ public class DataAcces {
         
         return usuaris;
     }
+    
     public Usuari getUser(int id){
         Connection connection = getConnection();
         
@@ -88,6 +90,7 @@ public class DataAcces {
         }
         return null;
     }
+    
     
     public Usuari verifyLogin(String nombre, char[] password){
         Connection connection = getConnection();
@@ -164,5 +167,45 @@ public class DataAcces {
             Logger.getLogger(DataAcces.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+   public ArrayList<Intent> getIntents(int idUsuari){
+    ArrayList<Intent> intents = new ArrayList<>(); // Explicitly type the ArrayList
+    Connection connection = getConnection();
+    String sql = "SELECT e.id, e.Descripcio, Timestamp_inici, Timestamp_Fi " +
+                 "FROM Intents i " +
+                 "JOIN Exercicis e ON i.idExercici = e.Id " +
+                 "WHERE i.idUsuari = ?;";  // Use a placeholder for parameterized query
+    
+    
+    try {
+        PreparedStatement selectStatement = connection.prepareStatement(sql);
+        selectStatement.setInt(1, idUsuari);
+        
+        ResultSet rs = selectStatement.executeQuery();
+        
+        while (rs.next()){
+            
+            Timestamp timestampInici = rs.getTimestamp("Timestamp_Inici");
+            Timestamp timestampFi = rs.getTimestamp("Timestamp_Fi");
+            
+            LocalDateTime inici = (timestampInici != null) ? timestampInici.toLocalDateTime() : null;
+            LocalDateTime fi = (timestampFi != null) ? timestampFi.toLocalDateTime() : null;
+            
+            Intent intento = new Intent();
+            intento.setId(rs.getInt("id"));
+            intento.setIdUsuari(idUsuari);
+            intento.setExercici(rs.getString("Descripcio"));
+            intento.setInici(inici);
+            intento.setFi(fi);
+            
+            intents.add(intento);  // Add intent to the list
+        }
+        rs.close();
+        selectStatement.close(); // Always close PreparedStatement
+    } catch (SQLException ex) {
+        Logger.getLogger(DataAcces.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    return intents;
+}
     
 }
