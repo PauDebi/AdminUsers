@@ -147,7 +147,7 @@ public class Register extends javax.swing.JFrame {
         int nouUsuariId = da.regUser(user);
         user.setId(nouUsuariId);
         JOptionPane.showMessageDialog(mainForm, "User created succesfuly with id: " + nouUsuariId);
-        mainForm.updateTable();
+        mainForm.updateClientList();
         this.dispose();
     }//GEN-LAST:event_jButtonRegisterActionPerformed
 

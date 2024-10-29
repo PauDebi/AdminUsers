@@ -70,6 +70,13 @@ public class Usuari {
     public void setIsInstructor(boolean isInstructor) {
         this.isInstructor = isInstructor;
     }
+
+    @Override
+    public String toString() {
+        return "Usuari{" + "id=" + id + ", nom=" + nom + ", email=" + email + ", paswordHash=" + paswordHash + ", foto=" + foto + ", isInstructor=" + isInstructor + '}';
+    }
+    
+    
     
     
     

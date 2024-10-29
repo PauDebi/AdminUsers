@@ -157,11 +157,9 @@ public class DataAcces {
     public void deleteUser(int id){
         Connection connection = getConnection();
         String sql = "delete from usuaris where id = " + id + ";";
-        System.out.println(sql);
         try {
             PreparedStatement deleteStatement = connection.prepareStatement(sql);
             int si = deleteStatement.executeUpdate();
-            System.out.println(si);
             connection.close();
         } catch (SQLException ex) {
             Logger.getLogger(DataAcces.class.getName()).log(Level.SEVERE, null, ex);

@@ -7,13 +7,9 @@ package com.mycompany.adminusers;
 import com.mycompany.adminusers.DTOs.Intent;
 import com.mycompany.adminusers.DTOs.Usuari;
 import com.mycompany.adminusers.dataAcces.DataAcces;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
-import javax.swing.JList;
-import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -31,9 +27,11 @@ public class MainForm extends javax.swing.JFrame {
     public MainForm() {
         initComponents();
         jTable1.getModel().addTableModelListener(new javax.swing.event.TableModelListener() {
-        public void tableChanged(javax.swing.event.TableModelEvent evt) {
-            jTable1TableChanged(evt);
-        }});
+            public void tableChanged(javax.swing.event.TableModelEvent evt) {
+                jTable1TableChanged(evt);
+            }
+        });
+        
         updateClientList();
         
         clientList.addListSelectionListener(new ListSelectionListener() {
@@ -41,9 +39,7 @@ public class MainForm extends javax.swing.JFrame {
             public void valueChanged(ListSelectionEvent evt) {
                 clientListSelectionChanged(evt);
             }
-        });
-        
-        
+        }); 
     }
      private void clientListSelectionChanged(ListSelectionEvent evt) {
         if (!evt.getValueIsAdjusting()) { // Para evitar eventos duplicados
@@ -179,7 +175,7 @@ public class MainForm extends javax.swing.JFrame {
     }
     
     
-    private void updateClientList(){
+    public void updateClientList(){
         DataAcces da = new DataAcces();
         ArrayList<Usuari> usuaris = da.getUsuaris();
         
@@ -223,8 +219,6 @@ public class MainForm extends javax.swing.JFrame {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel(); 
         Object newValue = model.getValueAt(row, column); // Nuevo valor de la celda
         Object pk = model.getValueAt(row, 0);
-        
-        System.out.println(pk);
     }
     
     public void setUser(Usuari user){

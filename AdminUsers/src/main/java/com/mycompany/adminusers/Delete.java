@@ -119,9 +119,8 @@ public class Delete extends javax.swing.JFrame {
         if (n != 0)
            return; 
         da.deleteUser(id);
-        
         JOptionPane.showMessageDialog(this, "deleted user "+user.getNom()+ " with id: " + id);
-        mainForm.updateTable();
+        mainForm.updateClientList();
         this.dispose();
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
